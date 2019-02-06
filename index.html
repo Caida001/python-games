@@ -1,15 +1,199 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    * {
+        outline: 1px dotted red;
+    }
 
-</head>
-<body>
-    <canvas id="board"></canvas>
-    <script src="tetris.js"></script>
-    
-</body>
-</html>
+    .empty {
+        width: 50px;
+        height: 50px;
+        background-color: black;
+        display: inline-block;
+    }
+
+    .squareShape {
+        width: 50px;
+        height: 50px;
+        background-color: blue;
+        outline: 2px solid black;
+        display: inline-block;
+    }
+</style>
+
+<div id="world"></div>
+
+<script>
+
+    let board = [
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,11,11,0,0,0],
+        [0,0,0,11,11,0,0,0],
+    ]
+
+    function drawBoard() {
+        document.getElementById('world').innerHTML = "";
+        for(let row = 0; row < board.length; row++) {
+ 
+            for(let col = 0; col < board[row].length; col++) {
+           
+                if(board[row][col] == 0) {
+                    document.getElementById('world').innerHTML += "<div class='empty'></div>"
+                } else if(board[row][col] == 1 || board[row][col] == 11) {
+                    document.getElementById('world').innerHTML += "<div class='squareShape'></div>"
+                }
+            }
+            document.getElementById('world').innerHTML += "<br>"
+        }
+    }
+
+    function moveShapesDown() {
+        let canMove = true;
+        for(let row=0; row < board.length; row++) {
+            for(let col=0; col < board[row].length; col++) {
+                if(board[row][col] > 0 && board[row][col] < 10) {
+                    if(row == board.length-1 || board[row+1][col] > 10){
+                        canMove = false;
+                        freeze();
+                    }
+                }
+            }
+        }
+
+        if(canMove) {
+            for(let row = board.length-1; row >= 0; row--){
+                for(let col = 0; col < board[row].length; col++) {
+                    if(board[row][col] > 0 && board[row][col] < 10) {
+                        board[row+1][col] = board[row][col];
+                        board[row][col] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    function moveShapesLeft() {
+        let canMove = true;
+        for(let row=0; row < board.length; row++) {
+            for(let col=0; col < board[row].length; col++) {
+                if(board[row][col] > 0 && board[row][col] < 10) {
+                    if(col==0 || board[row][col-1] > 10){
+                        canMove = false;
+                    }
+                }
+            }
+        }
+
+        if(canMove) {
+            for(let row = board.length-1; row >= 0; row--){
+                for(let col = 0; col < board[row].length; col++) {
+                    if(board[row][col] > 0 && board[row][col] < 10) {
+                        board[row][col-1] = board[row][col];
+                        board[row][col] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    function moveShapesRight() {
+        let canMove = true;
+        for(let row=board.length-1; row >= 0; row--) {
+            for(let col=0; col < board[row].length; col++) {
+                if(board[row][col] > 0 && board[row][col] < 10) {
+                    if(col==board[0].length-1 || board[row][col+1] > 10){
+                        canMove = false;
+                    }
+                }
+            }
+        }
+
+        if(canMove) {
+            for(let row = board.length-1; row >= 0; row--){
+                for(let col = board[row].length; col >= 0; col--) {
+                    if(board[row][col] > 0 && board[row][col] < 10) {
+                        board[row][col+1] = board[row][col];
+                        board[row][col] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+
+    function freeze() {
+        for(let row=0; row < board.length; row++) {
+            for(let col=0; col < board[row].length; col++) {
+                if(board[row][col] > 0 && board[row][col] < 10) {
+                    board[row][col] = board[row][col] + 10;
+                }
+            }
+        }
+        checkLines();
+        let ran = Math.floor(Math.random()*3);
+        if(ran == 0) {
+            board[0] = [0,0,0,1,1,0,0,0];
+            board[1] = [0,0,0,1,1,0,0,0];
+        } else if(ran == 1) {
+            board[0] = [0,0,0,1,0,0,0,0];
+            board[1] = [0,0,0,1,0,0,0,0];
+            board[2] = [0,0,0,1,0,0,0,0];
+            board[3] = [0,0,0,1,0,0,0,0]
+        } else if(ran == 2){
+            board[0] = [0,0,0,0,1,0,0,0];
+            board[1] = [0,0,0,1,1,0,0,0];
+            board[2] = [0,0,0,1,1,0,0,0];
+            
+        }
+        board[0] = [0,0,0,1,1,0,0,0];
+        board[1] = [0,0,0,1,1,0,0,0];
+    }
+
+    function checkLines() {
+        for(let row=0; row < board.length; row++) {
+            fullLine = true;
+            for(let col=0; col < board[row].length; col++) {
+                if(board[row][col] < 10) {
+                    fullLine = false;
+                }
+            }
+            if(fullLine) {
+                board.splice(row, 1);
+                board.splice(0,0,[0,0,0,0,0,0,0,0]);
+                row--;
+            }
+        }
+    }
+
+    document.onkeydown = function(e) {
+        if(e.keyCode == 37) {
+            moveShapesLeft();
+        } else if(e.keyCode == 39) {
+            moveShapesRight();
+        } else if(e.keyCode == 40) {
+            moveShapesDown();
+        }
+        drawBoard();
+    }
+
+
+    function gameLoop() {
+        console.log("game loop running");
+        moveShapesDown();
+        drawBoard();
+        setTimeout(gameLoop, 1000);
+    }
+
+
+    drawBoard();
+    gameLoop();
+
+</script>
+
